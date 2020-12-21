@@ -15,7 +15,6 @@ df <- data.frame(Rnk = character(), Rider = character(), Time = character(), str
 for (y in years[[1]]) {
 
   #Set the url and parse the html file. 
-  # url <- paste("https://www.procyclingstats.com/race/dauphine/",y,"/gc", sep = "")
   url <- paste("https://www.procyclingstats.com/race/",r,"/",y,"/gc", sep = "")
   html <- read_html(url)
   
