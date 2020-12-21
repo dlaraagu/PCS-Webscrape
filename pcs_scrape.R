@@ -6,7 +6,7 @@ library(rvest)
 years <- list(seq(from = 2000, to = 2020))
 
 #Specify the race.
-r <- "tour-de-france"
+r <- "giro-d-italia"
 
 #Create an empty dataset to append to. 
 df <- data.frame(Rnk = character(), Rider = character(), Time = character(), stringsAsFactors = FALSE)
@@ -23,12 +23,9 @@ for (y in years[[1]]) {
   df_sub <- html %>% html_nodes(tloc) %>% .[[2]] %>% html_table(fill = TRUE)
   
   #Clean the data before appending.
-  if ("Prev" %in% names(df_sub)) {
-    df_sub$Rnk <- ifelse(is.na(df_sub$Rnk), df_sub$Prev, df_sub$Rnk)
-  }
-  df_sub$Rnk   <- ifelse(is.na(df_sub$Rnk), shift(df_sub$Rnk, type = 'lag') + 1, df_sub$Rnk)
+  df_sub$Rank <- rownames(df_sub)
   df_sub$Rider <- substr(df_sub$Rider, 1, nchar(df_sub$Rider) - nchar(df_sub$Team))
-  df_sub$Time  <- substr(df_sub$Time, 1, ceiling(nchar(df_sub$Time)/2))
+  df_sub$Time  <- substr(df_sub$Time, 1, ceiling(nchar(df_sub$Time) / 2))
   df_sub$Year  <- y
   
   #Format the time field.
@@ -41,10 +38,10 @@ for (y in years[[1]]) {
   df_sub$Time <- with(df_sub, ifelse(nchar(df_sub$Time) == 7, paste("0", df_sub$Time, sep = ""), df_sub$Time))
   df_sub$Time <- as.numeric(substr(df_sub$Time, 1, 2)) + as.numeric(substr(df_sub$Time, 4, 5)) / 60 + 
                  as.numeric(substr(df_sub$Time, 7, 8)) / 3600
-  df_sub$Time[df_sub$Rnk != 1] <- df_sub$Time[df_sub$Rnk != 1] + df_sub$Time[1]
+  df_sub$Time[df_sub$Rank != 1] <- df_sub$Time[df_sub$Rank != 1] + df_sub$Time[1]
   
   #Select the relevant data fields. 
-  df_sub <- df_sub[c("Year", "Rnk", "Rider", "Age", "Team", "Time")]
+  df_sub <- df_sub[c("Year", "Rank", "Rider", "Age", "Team", "Time")]
   
   #Append to the empty dataset.
   df <- rbind(df, df_sub)
